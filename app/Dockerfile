@@ -1,15 +1,8 @@
-FROM ruby:2.5.1
+FROM mhart/alpine-node:7.10.1
 
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
+WORKDIR /srv
+ADD . .
+RUN npm install
 
-RUN mkdir /sapp
-WORKDIR /sapp
-
-ADD Gemfile /sapp/Gemfile
-ADD Gemfile.lock /sapp/Gemfile.lock
-
-RUN bundle install
-
-ADD . /sapp
-
-CMD ["ruby", "service.rb", "-o", "0.0.0.0"]
+EXPOSE 3000
+CMD ["node", "app.js"]
