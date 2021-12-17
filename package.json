@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/chopincode/movie-recommendation-service#readme",
   "dependencies": {
+    "axios": "^0.24.0",
     "express": "^4.17.1"
   }
 }
