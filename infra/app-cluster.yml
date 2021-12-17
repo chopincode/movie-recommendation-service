@@ -6,7 +6,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: 'bookstore'
+      ClusterName: 'MovieRecommendationCluster'
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -62,24 +62,20 @@ Resources:
 
 
 Outputs:
-  
   Cluster:
     Value: !Ref ECSCluster
     Export:
       Name: 'ECSCluster'
-
   Listener:
     Description: listener port 80
     Value: !Ref LoadBalancerListener
     Export:
       Name: 'Listener'
-
   ContainerSecurityGroup:
     Description: container security group
     Value: !Ref ContainerSecurityGroup
     Export:
       Name: 'ContainerSecurityGroup'
-
   LoadBalancerDNS:
     Description: Domain name for the loadbalancer
     Value: !GetAtt LoadBalancer.DNSName

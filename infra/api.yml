@@ -14,25 +14,25 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
       ContainerDefinitions:
-        - Name: booksapi
-          Image: 532497595666.dkr.ecr.us-west-2.amazonaws.com/books-api:v1
+        - Name: movierecommendationapi
+          Image: 166284354973.dkr.ecr.us-west-2.amazonaws.com/movie-recommendation-service-api:v1
           Cpu: 256
           Memory: 512
           PortMappings:
-            - ContainerPort: 4567
+            - ContainerPort: 3000
               Protocol: tcp
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: 'apis'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'books-api'
+              awslogs-stream-prefix: 'movie-recommendation-service-api'
 
   Service:
     Type: AWS::ECS::Service
     DependsOn: ListenerRule
     Properties:
-      ServiceName: books-service
+      ServiceName: movie-recommendation-service
       TaskDefinition: !Ref Task
       Cluster: !ImportValue 'ECSCluster'
       LaunchType: FARGATE
@@ -49,21 +49,21 @@ Resources:
           SecurityGroups:
             - !ImportValue ContainerSecurityGroup
       LoadBalancers:
-        - ContainerName: booksapi
-          ContainerPort: 4567
+        - ContainerName: movierecommendationapi
+          ContainerPort: 3000
           TargetGroupArn: !Ref TargetGroup
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: books-tg
+      Name: movie-recommendation-tg
       VpcId: !ImportValue VPC
       Port: 80
       Protocol: HTTP
       Matcher:
         HttpCode: 200-299
       HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /stat
+      HealthCheckPath: /recommendations
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 10
@@ -77,17 +77,16 @@ Resources:
       Conditions:
         - Field: path-pattern
           Values:
-            - /api/book*
+            - /recommendations
       Actions:
         - TargetGroupArn: !Ref TargetGroup
           Type: forward
 
 
 Outputs:
-
   ApiEndpoint:
-    Description: Books API Endpoint
-    Value: !Join ['', ['http://', !ImportValue DomainName, '/api/books']]
+    Description: Movie recommendation API Endpoint
+    Value: !Join ['', ['http://', !ImportValue DomainName, '/recommendations']]
     Export:
-      Name: 'BooksApiEndpoint'
+      Name: 'MovieRecommendationsApiEndpoint'
 
